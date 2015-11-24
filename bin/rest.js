@@ -1,8 +1,5 @@
-function nonAuth(req, res, next) {
-  next();
-}
+function rest(app, config, controllers, middlewares) {
 
-function rest(app, config, controllers) {
   try {
     require.resolve(config + 'MainConfig');
     require.resolve(config + 'RouteConfig');
@@ -13,7 +10,8 @@ function rest(app, config, controllers) {
     main.apiPrefix = !main.apiPrefix ? main.apiPrefix = '/api/' : '/' + main.apiPrefix + '/';
 
     routes.forEach(function (r) {
-      var url = main.apiPrefix + r.url, controller;
+      var url    = main.apiPrefix + r.url, controller,
+          middle = require('./middle')(app, url, r.middlewares, middlewares);
 
       if (main.gerericController && !r.controller) {
         if (!r.args)
@@ -26,13 +24,11 @@ function rest(app, config, controllers) {
         console.log('Error on Controller Configuration');
       }
 
-
-      if (controller.findById) app.get(url + "/:id", nonAuth , controller.findById);
-      if (controller.find) app.get(url, nonAuth, controller.find);
-      if (controller.create) app.post(url, nonAuth , controller.create);
-      if (controller.update) app.put(url + "/:id", nonAuth , controller.update);
-      if (controller.remove) app.delete(url + "/:id", nonAuth , controller.remove);
-      if (controller.middleware) app.all(url, nonAuth , controller.middleware);
+      if (controller.findById) app.get(url + "/:id", middle.get , controller.findById);
+      if (controller.find) app.get(url, middle.get, controller.find);
+      if (controller.create) app.post(url, middle.post , controller.create);
+      if (controller.update) app.put(url + "/:id", middle.put , controller.update);
+      if (controller.remove) app.delete(url + "/:id", middle.remove , controller.remove);
     });
   } catch (e) {
     console.log(e);
