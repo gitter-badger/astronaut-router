@@ -1,4 +1,5 @@
 module.exports = function (app, url, middlewares, path) {
+  console.log(middlewares)
   if (middlewares) {
     if (middlewares.length && middlewares.length > 0) {
 
@@ -24,5 +25,7 @@ module.exports = function (app, url, middlewares, path) {
     });
 
     return mids;
+  } else {
+    return {get : [], post : [], put : [], delete : []};
   }
 };
