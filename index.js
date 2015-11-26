@@ -14,17 +14,9 @@ function argsGetter() {
   };
 }
 
-function Rest(app) {
+function Route(app) {
   var args = argsGetter();
   require('./bin/rest')(app, args.config, args.controllers, args.middlewares);
 }
 
-function Mvc(app) {
-  var args = argsGetter();
-  require('./bin/mvc')(app, args.config, args.controllers);
-}
-
-module.exports = {
-  rest : Rest,
-  mvc  : Mvc
-};
+module.exports = {attach : Route};
