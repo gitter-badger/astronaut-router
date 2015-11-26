@@ -16,7 +16,7 @@ function argsGetter() {
 
 function Route(app) {
   var args = argsGetter();
-  require('./bin/rest')(app, args.config, args.controllers, args.middlewares);
+  require('./bin/route')(app, args.config, args.controllers, args.middlewares);
 }
 
 module.exports = {attach : Route};
