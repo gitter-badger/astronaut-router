@@ -24,11 +24,20 @@ function rest(app, config, controllers, middlewares) {
         console.log('Error on Controller Configuration');
       }
 
-      if (controller.findById) app.get(url + "/:id", middle.get , controller.findById);
-      if (controller.find) app.get(url, middle.get, controller.find);
-      if (controller.create) app.post(url, middle.post , controller.create);
-      if (controller.update) app.put(url + "/:id", middle.put , controller.update);
-      if (controller.remove) app.delete(url + "/:id", middle.remove , controller.remove);
+      if (controller.findById || r.mapping.findById)
+        app.get(url + "/:id", middle.get , controller.findById ? controller.findById : controller[r.mapping.findById]);
+
+      if (controller.find || r.mapping.find)
+        app.get(url, middle.get, controller.find ? controller.find : controller[r.mapping.find]);
+
+      if (controller.create || r.mapping.create)
+        app.post(url, middle.post , controller.create ? controller.create : controller[r.mapping.create]);
+
+      if (controller.update || r.mapping.update)
+        app.put(url + "/:id", middle.put , controller.update ? controller.update : controller[r.mapping.update]);
+
+      if (controller.remove || r.mapping.remove)
+        app.delete(url + "/:id", middle.remove , controller.remove ? controller.remove : controller[r.mapping.remove]);
     });
   } catch (e) {
     console.log(e);
