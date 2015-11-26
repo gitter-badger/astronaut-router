@@ -10,20 +10,29 @@ function rest(app, config, controllers, middlewares) {
     main.apiPrefix = !main.apiPrefix ? main.apiPrefix = '/api/' : '/' + main.apiPrefix + '/';
 
     routes.forEach(function (r) {
-      var url    = main.apiPrefix + r.url, controller,
-          middle = require('./middle')(app, url, r.middlewares, middlewares);
+      var url      = main.apiPrefix + r.url, controller,
+          middle   = require('./middle')(app, url, r.middlewares, middlewares),
+          instance = null;
 
       if (main.gerericController && !r.controller) {
         if (!r.args)
           controller = require(controllers + main.gerericController);
-        else
-          controller = require(controllers + main.gerericController)(r.args);
+        else {
+          instance = require(controllers + main.gerericController);
+          controller = new instance(r.args);
+        }
       } else if (r.controller) {
-        controller = require(controllers + r.controller);
+        if (r.args) {
+          instance = require(controllers + r.controller);
+          controller = new instance(r.args);
+        } else
+          controller = require(controllers + r.controller);
       } else {
         console.log('Error on Controller Configuration');
       }
 
+      if (!r.mapping) r.mapping = {};
+      
       if (controller.findById || r.mapping.findById)
         app.get(url + "/:id", middle.get , controller.findById ? controller.findById : controller[r.mapping.findById]);
 
