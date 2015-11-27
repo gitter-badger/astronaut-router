@@ -24,24 +24,26 @@ function Convert(app, type, controllers, middlewares) {
       }
       //End Try
     } else {
-      globalLoadedMiddlewares[file] = {all:[], get:[], post:[], put:[], delete:[]};
+      var name = file.split("_")[0];
+      globalLoadedMiddlewares[name] = {all:[], get:[], post:[], put:[], delete:[]};
       fs.readdirSync(middlewares + file).forEach(function (js) {
         //Start Try
         try {
           require.resolve(middlewares + file + "/" + js);
-          var mid = require(middlewares + file + "/" + js);
+          var mid  = require(middlewares + file + "/" + js);
+
 
           if (typeof mid == 'function') {
-            globalLoadedMiddlewares[file].all.push(mid);
+            globalLoadedMiddlewares[name].all.push(mid);
           } else if (typeof mid == 'object') {
             if (mid.include) {
               mid.include.forEach(function(method) {
-                globalLoadedMiddlewares[file][method].push(mid.fn);
+                globalLoadedMiddlewares[name][method].push(mid.fn);
               });
             } else if (mid.exclude) {
-              Object.keys(globalLoadedMiddlewares[file]).forEach(function (k) {
+              Object.keys(globalLoadedMiddlewares[name]).forEach(function (k) {
                 if (mid.exclude.indexOf(k) || mid.exclude.indexOf(k.toUpperCase()))
-                  globalLoadedMiddlewares[file][k] = mid.fn;
+                  globalLoadedMiddlewares[name][k] = mid.fn;
               });
             } else {
               console.log("[Miss Error : You need put a property exclude or include in Object Middlewares]");
@@ -79,7 +81,7 @@ function Convert(app, type, controllers, middlewares) {
 
       if (mid.all)
         app.all(url, mid.all);
-      
+
       if (type == 'rest') {
         if (controller.findById) {app.get(url + "/:id", mid.get, controller.findById); delete controller.findById}
         if (controller.find) {app.get(url, mid.get, controller.find); delete controller.find};
