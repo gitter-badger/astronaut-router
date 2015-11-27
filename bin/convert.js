@@ -1,63 +1,7 @@
 function Convert(app, type, controllers, middlewares) {
   var fs = require("fs"),
-      globalLoadedMiddlewares = {};
-
-  /**
-   * This function register global middlewares, and construct middleObject
-   */
-  fs.readdirSync(middlewares).forEach(function (file) {
-    if (file.indexOf(".js") > -1) {
-      //Start Try
-      try {
-        require.resolve(middlewares + file);
-        var mid = require(middlewares + file);
-
-        if (typeof mid == 'function') {
-          app.use(mid);
-        } else if (typeof mid == 'object') {
-
-        } else {
-          console.log('[Type Error : Middleware need be a Object/Function]');
-        }
-      } catch (e) {
-        console.log(e);
-      }
-      //End Try
-    } else {
-      var name = file.split("_")[0];
-      globalLoadedMiddlewares[name] = {all:[], get:[], post:[], put:[], delete:[]};
-      fs.readdirSync(middlewares + file).forEach(function (js) {
-        //Start Try
-        try {
-          require.resolve(middlewares + file + "/" + js);
-          var mid  = require(middlewares + file + "/" + js);
-
-
-          if (typeof mid == 'function') {
-            globalLoadedMiddlewares[name].all.push(mid);
-          } else if (typeof mid == 'object') {
-            if (mid.include) {
-              mid.include.forEach(function(method) {
-                globalLoadedMiddlewares[name][method].push(mid.fn);
-              });
-            } else if (mid.exclude) {
-              Object.keys(globalLoadedMiddlewares[name]).forEach(function (k) {
-                if (mid.exclude.indexOf(k) || mid.exclude.indexOf(k.toUpperCase()))
-                  globalLoadedMiddlewares[name][k] = mid.fn;
-              });
-            } else {
-              console.log("[Miss Error : You need put a property exclude or include in Object Middlewares]");
-            }
-          } else {
-            console.log('[Type Error : Middleware need be a Object/Function]');
-          }
-        } catch (e) {
-          console.log(e);
-        }
-        //End Try
-      });
-    }
-  });
+      _controllerFiles = fs.readdirSync(controllers);
+      globalLoadedMiddlewares = require('./middle_convert')(middlewares, _controllerFiles);
 
   /**
    * This function MAP the routes by filess
