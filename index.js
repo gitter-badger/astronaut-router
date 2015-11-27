@@ -14,9 +14,18 @@ function argsGetter() {
   };
 }
 
-function Route(app) {
+function Config(app) {
   var args = argsGetter();
-  require('./bin/route')(app, args.config, args.controllers, args.middlewares);
+  require('./bin/config')(app, args.config, args.controllers, args.middlewares);
 }
 
-module.exports = {attach : Route};
+function Convert(app, type) {
+  var args = argsGetter();
+  if (!type) console.log("[TypeError: No type declared in Convert Router]");
+  require('./bin/convert')(app, type, args.controllers, args.middlewares);
+}
+
+module.exports = {
+  byConfiguration : Config,
+  byConvertion : Convert
+};
