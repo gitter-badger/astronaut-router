@@ -26,6 +26,11 @@ function Convert(app, type, controllers, middlewares) {
       if (mid.all)
         app.all(url, mid.all);
 
+      if (controller.ControllerName) {
+        url = "/" + controller.ControllerName;
+        delete controller.ControllerName;
+      }
+      
       if (type == 'rest') {
         if (controller.findById) {app.get(url + "/:id", mid.get, controller.findById); delete controller.findById}
         if (controller.find) {app.get(url, mid.get, controller.find); delete controller.find};
