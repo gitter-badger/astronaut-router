@@ -4,7 +4,7 @@ function Convert(app, type, controllers, middlewares) {
       globalLoadedMiddlewares = require('./middle_convert')(middlewares, _controllerFiles);
 
   try {
-    _controllerFiles = fs.readdirSync(controllers);
+    fs.readdir(controllers, readdirCallback);
   } catch (e) {
     console.log("[DECLARATION PATH ERROR] The path to the controllers doesn't exist, verify your astronaut.js");
     process.exit(0);
@@ -12,42 +12,59 @@ function Convert(app, type, controllers, middlewares) {
   /**
    * This function MAP the routes by filess
    */
-  _controllerFiles.forEach(function(file) {
-    try {
-      require.resolve(controllers + file);
+  function readdirCallback(err, controllerfiles) {
+    if (err) {
+      console.log('[NATIVE ERR]', err);
+      return;
+    }
 
-      var controller   = null,
-          __name       = file.split("_")[0],
-          url          = "/" + __name,
-          _require     = require(controllers + file),
-          mid          = globalLoadedMiddlewares[__name] ? globalLoadedMiddlewares[__name] : {get:[], post:[], put:[], delete:[]};
+    controllerfiles.forEach(function(file) {
+      try {
+        require.resolve(controllers + file);
 
-      if (typeof _require == 'function')
-        controller = new _require();
-      else if (typeof _require == 'object')
-        controller = _require;
-      else
-        console.log('[Type Error : Controller need be a Object/Function]');
+        var controller   = null,
+            __name       = file.split("_")[0],
+            url          = "/" + __name,
+            _require     = require(controllers + file),
+            mid          = globalLoadedMiddlewares[__name] ? globalLoadedMiddlewares[__name] : {get:[], post:[], put:[], delete:[]};
 
-      if (mid.all)
-        app.all(url, mid.all);
+        if (typeof _require == 'function')
+          controller = new _require();
+        else if (typeof _require == 'object')
+          controller = _require;
+        else
+          console.log('[Type Error : Controller need be a Object/Function]');
 
-      if (controller.ControllerName) {
-        url = "/" + controller.ControllerName;
-        delete controller.ControllerName;
-      }
+        if (mid.all)
+          app.all(url, mid.all);
 
-      if (type == 'rest') {
-        if (controller.findById) {app.get(url + "/:id", mid.get, controller.findById); delete controller.findById}
-        if (controller.find) {app.get(url, mid.get, controller.find); delete controller.find};
-        if (controller.create) {app.post(url, mid.post, controller.create); delete controller.create}
-        if (controller.update) {app.put(url + "/:id", mid.put, controller.update);delete controller.update}
-        if (controller.remove) {app.delete(url + "/:id", mid.delete, controller.remove); delete controller.remove}
+        if (controller.ControllerName) {
+          url = "/" + controller.ControllerName;
+          delete controller.ControllerName;
+        }
 
-        var keys = Object.keys(controller);
+        if (type == 'rest') {
+          if (controller.findById) {app.get(url + "/:id", mid.get, controller.findById); delete controller.findById}
+          if (controller.find) {app.get(url, mid.get, controller.find); delete controller.find};
+          if (controller.create) {app.post(url, mid.post, controller.create); delete controller.create}
+          if (controller.update) {app.put(url + "/:id", mid.put, controller.update);delete controller.update}
+          if (controller.remove) {app.delete(url + "/:id", mid.delete, controller.remove); delete controller.remove}
 
-        if (keys.length > 0) {
-          keys.forEach(function (k) {
+          var keys = Object.keys(controller);
+
+          if (keys.length > 0) {
+            keys.forEach(function (k) {
+              var kArr = k.split('_'),
+                  method = kArr[0].toLowerCase(),
+                  urlCom = kArr[1];
+
+              app[method](url + "/" + urlCom, mid[method], controller[k]);
+            });
+          }
+        }
+
+        if (type == 'mvc') {
+          Object.keys(controller).forEach(function (k) {
             var kArr = k.split('_'),
                 method = kArr[0].toLowerCase(),
                 urlCom = kArr[1];
@@ -55,24 +72,13 @@ function Convert(app, type, controllers, middlewares) {
             app[method](url + "/" + urlCom, mid[method], controller[k]);
           });
         }
+
+
+      } catch (e) {
+        console.log(e);
       }
-
-      if (type == 'mvc') {
-        Object.keys(controller).forEach(function (k) {
-          var kArr = k.split('_'),
-              method = kArr[0].toLowerCase(),
-              urlCom = kArr[1];
-
-          app[method](url + "/" + urlCom, mid[method], controller[k]);
-        });
-      }
-
-
-    } catch (e) {
-      console.log(e);
-    }
-  });
-
+    });
+  }
 }
 
 module.exports = Convert;
