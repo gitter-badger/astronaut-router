@@ -1,7 +1,5 @@
-function Convert(app, type, controllers, middlewares) {
-  var fs = require("fs"),
-      _controllerFiles = null,
-      globalLoadedMiddlewares = require('./middle_convert')(middlewares, _controllerFiles);
+function Convert(app, type, controllers, middlewares, prefix) {
+  var fs = require("fs");
 
   try {
     fs.readdir(controllers, readdirCallback);
@@ -15,8 +13,10 @@ function Convert(app, type, controllers, middlewares) {
   function readdirCallback(err, controllerfiles) {
     if (err) {
       console.log('[NATIVE ERR]', err);
-      return;
+      process.exit(0);
     }
+
+    var globalLoadedMiddlewares = require('./middle_convert')(middlewares, controllerfiles);
 
     controllerfiles.forEach(function(file) {
       try {
@@ -24,7 +24,7 @@ function Convert(app, type, controllers, middlewares) {
 
         var controller   = null,
             __name       = file.split("_")[0],
-            url          = "/" + __name,
+            url          = "/" + (prefix ? prefix + "/" : "") + __name,
             _require     = require(controllers + file),
             mid          = globalLoadedMiddlewares[__name] ? globalLoadedMiddlewares[__name] : {get:[], post:[], put:[], delete:[]};
 
@@ -39,7 +39,7 @@ function Convert(app, type, controllers, middlewares) {
           app.all(url, mid.all);
 
         if (controller.ControllerName) {
-          url = "/" + controller.ControllerName;
+          url = url.replace(__name, controller.ControllerName);
           delete controller.ControllerName;
         }
 

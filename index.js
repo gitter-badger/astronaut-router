@@ -24,7 +24,7 @@ function Config(app) {
   require('./bin/config')(app, args.config, args.controllers, args.middlewares);
 }
 
-function Convert(app, type) {
+function Convert(app, type, prefix) {
   var args = argsGetter();
 
   if (!type) {
@@ -35,7 +35,7 @@ function Convert(app, type) {
     return;
   }
 
-  require('./bin/convert')(app, type, args.controllers, args.middlewares);
+  require('./bin/convert')(app, type, args.controllers, args.middlewares, prefix);
 }
 
 module.exports = {
