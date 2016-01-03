@@ -1,12 +1,18 @@
 function Convert(app, type, controllers, middlewares) {
   var fs = require("fs"),
-      _controllerFiles = fs.readdirSync(controllers),
+      _controllerFiles = null,
       globalLoadedMiddlewares = require('./middle_convert')(middlewares, _controllerFiles);
 
+  try {
+    _controllerFiles = fs.readdirSync(controllers);
+  } catch (e) {
+    console.log("[DECLARATION PATH ERROR] The path to the controllers doesn't exist, verify your astronaut.js");
+    process.exit(0);
+  }
   /**
    * This function MAP the routes by filess
    */
-  fs.readdirSync(controllers).forEach(function(file) {
+  _controllerFiles.forEach(function(file) {
     try {
       require.resolve(controllers + file);
 
