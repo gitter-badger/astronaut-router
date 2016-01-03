@@ -1,9 +1,9 @@
 function argsGetter() {
   var path        = __filename.split('/node_modules/')[0],
       astronaut   = require(path + '/astronaut.js'),
-      controllers = path + '/' + astronaut.controllers + "/",
-      middlewares = path + '/' + astronaut.middlewares + "/",
-      config      = path + '/' + astronaut.configs + "/";
+      controllers = astronaut.controllers ? path + '/' + astronaut.controllers + "/" : null,
+      middlewares = astronaut.middlewares ? path + '/' + astronaut.middlewares + "/" : null,
+      config      = astronaut.configs ? path + '/' + astronaut.configs + "/" : null;
 
   return {
     path        : path,

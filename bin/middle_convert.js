@@ -1,10 +1,12 @@
 module.exports = function (middlewares, controllers) {
-var fs          = require('fs'),
-    middleDIR   = fs.readdirSync(middlewares),
-    controllers = controllers.map(function (c) { return c.split('_')[0];}),
-    globalMid   = middleDIR.filter(function (f){return f.indexOf(".js") > -1}),
-    localMid    = middleDIR.filter(function (f){return f.indexOf(".js") < 0}),
-    globalLoadedMiddlewares = {};
+  if (!middlewares) return {};
+
+  var fs          = require('fs'),
+      middleDIR   = fs.readdirSync(middlewares),
+      controllers = controllers.map(function (c) { return c.split('_')[0];}),
+      globalMid   = middleDIR.filter(function (f){return f.indexOf(".js") > -1}),
+      localMid    = middleDIR.filter(function (f){return f.indexOf(".js") < 0}),
+      globalLoadedMiddlewares = {};
 
   controllers.forEach(function (c) {
     globalLoadedMiddlewares[c] = {all:[], get:[], post:[], put:[], delete:[]};

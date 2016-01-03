@@ -1,6 +1,6 @@
 function Convert(app, type, controllers, middlewares) {
   var fs = require("fs"),
-      _controllerFiles = fs.readdirSync(controllers);
+      _controllerFiles = fs.readdirSync(controllers),
       globalLoadedMiddlewares = require('./middle_convert')(middlewares, _controllerFiles);
 
   /**
@@ -30,7 +30,7 @@ function Convert(app, type, controllers, middlewares) {
         url = "/" + controller.ControllerName;
         delete controller.ControllerName;
       }
-      
+
       if (type == 'rest') {
         if (controller.findById) {app.get(url + "/:id", mid.get, controller.findById); delete controller.findById}
         if (controller.find) {app.get(url, mid.get, controller.find); delete controller.find};
