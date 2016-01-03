@@ -13,6 +13,7 @@
   "author": "Guilherme Diego",
   "license": "MIT",
   "files": [
-    "index.js"
+    "index.js",
+    "bin/"
   ]
 }
