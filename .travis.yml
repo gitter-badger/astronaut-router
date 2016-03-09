@@ -8,5 +8,4 @@ cache:
     - node_modules
 
 script:
-  - npm run test:lcov
-  - npm run codeclimate
+  - npm run test:lcov && npm run codeclimate
