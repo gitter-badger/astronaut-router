@@ -2,7 +2,9 @@ chai    = require 'chai'
 someVar = true;
 chai.should()
 
+tesss = require '../src/covertest'
+
 describe 'Test of test', ->
 
   it 'A little test to test travis', ->
-    someVar.should.equal true
+    tesss.value.should.equal true
