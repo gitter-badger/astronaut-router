@@ -9,7 +9,7 @@
     "test:lcov": "node node_modules/istanbul/lib/cli cover node_modules/mocha/bin/_mocha -- --recursive __test__ --compilers coffee:coffee-script/register --require coffee-coverage/register __test__",
     "build": "node node_modules/coffee-script/bin/coffee --compile src/*.coffee --output bin/",
     "build:dev" : "node node_modules/coffee-script/bin/coffee --watch --compile src/*.coffee --output bin/",
-    "codeclimate" : "CODECLIMATE_REPO_TOKEN=da78ebce010181d7c55612744d6c79c3a4ed56c0819205e7718c19c3c24f243b && node node_modules/codeclimate-test-reporter/bin/codeclimate-test-reporter < coverage/lvoc.info"
+    "codeclimate" : "CODECLIMATE_REPO_TOKEN=da78ebce010181d7c55612744d6c79c3a4ed56c0819205e7718c19c3c24f243b && node node_modules/codeclimate-test-reporter/bin/codeclimate-test-reporter < ./coverage/lvoc.info"
   },
   "keywords": [
     "astronautjs",
